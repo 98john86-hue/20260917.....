@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EnglishUp - 영어 단어 학습</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇬🇧</text></svg>" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo">🇬🇧</span>
+        <span class="brand-name">EnglishUp</span>
+      </div>
+      <nav class="tabs">
+        <button class="tab-btn active" data-view="home">홈</button>
+        <button class="tab-btn" data-view="flashcard">플래시카드</button>
+        <button class="tab-btn" data-view="quiz">퀴즈</button>
+        <button class="tab-btn" data-view="wordlist">단어장</button>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <!-- HOME VIEW -->
+      <section id="view-home" class="view active">
+        <h1 class="page-title">오늘도 영어 단어를 정복해봐요 💪</h1>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">전체 단어</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-learned">0</div>
+            <div class="stat-label">학습 완료</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-today">0</div>
+            <div class="stat-label">오늘 학습</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-streak">0일</div>
+            <div class="stat-label">연속 학습</div>
+          </div>
+        </div>
+
+        <div class="progress-block">
+          <div class="progress-block-head">
+            <span>전체 학습 진도</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="home-progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="level-cards">
+          <button class="level-card" data-level="beginner">
+            <div class="level-emoji">🌱</div>
+            <div class="level-name">초급</div>
+            <div class="level-count" id="count-beginner">0/0</div>
+          </button>
+          <button class="level-card" data-level="intermediate">
+            <div class="level-emoji">🌿</div>
+            <div class="level-name">중급</div>
+            <div class="level-count" id="count-intermediate">0/0</div>
+          </button>
+          <button class="level-card" data-level="advanced">
+            <div class="level-emoji">🌳</div>
+            <div class="level-name">고급</div>
+            <div class="level-count" id="count-advanced">0/0</div>
+          </button>
+        </div>
+
+        <div class="cta-row">
+          <button class="btn btn-primary" id="home-start-flashcard">플래시카드 학습 시작</button>
+          <button class="btn btn-secondary" id="home-start-quiz">퀴즈 풀기</button>
+        </div>
+      </section>
+
+      <!-- FLASHCARD VIEW -->
+      <section id="view-flashcard" class="view">
+        <div class="view-toolbar">
+          <div class="filter-group" id="flashcard-level-filter">
+            <button class="filter-btn active" data-level="all">전체</button>
+            <button class="filter-btn" data-level="beginner">초급</button>
+            <button class="filter-btn" data-level="intermediate">중급</button>
+            <button class="filter-btn" data-level="advanced">고급</button>
+          </div>
+          <label class="filter-checkbox">
+            <input type="checkbox" id="flashcard-unlearned-only" />
+            아직 모르는 단어만
+          </label>
+        </div>
+
+        <div class="flashcard-progress">
+          <span id="flashcard-position">0 / 0</span>
+          <div class="progress-bar-outer small">
+            <div class="progress-bar-inner" id="flashcard-progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="flashcard-stage">
+          <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-face flashcard-front">
+                <span class="fc-level-badge" id="fc-level-badge">초급</span>
+                <div class="fc-word" id="fc-word">word</div>
+                <div class="fc-pos" id="fc-pos">품사</div>
+                <div class="fc-hint">카드를 클릭해서 뜻을 확인하세요</div>
+              </div>
+              <div class="flashcard-face flashcard-back">
+                <div class="fc-meaning" id="fc-meaning">뜻</div>
+                <div class="fc-example" id="fc-example">example sentence</div>
+                <div class="fc-example-ko" id="fc-example-ko">예문 해석</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flashcard-controls">
+          <button class="btn btn-outline" id="fc-prev">← 이전</button>
+          <button class="btn btn-danger" id="fc-dontknow">아직 몰라요</button>
+          <button class="btn btn-success" id="fc-know">알고 있어요 ✓</button>
+          <button class="btn btn-outline" id="fc-next">다음 →</button>
+        </div>
+        <div class="empty-state" id="flashcard-empty" hidden>
+          🎉 이 조건에 맞는 단어를 모두 학습했어요!
+        </div>
+      </section>
+
+      <!-- QUIZ VIEW -->
+      <section id="view-quiz" class="view">
+        <div id="quiz-setup" class="quiz-setup">
+          <h2>퀴즈 설정</h2>
+          <div class="filter-group" id="quiz-level-filter">
+            <button class="filter-btn active" data-level="all">전체</button>
+            <button class="filter-btn" data-level="beginner">초급</button>
+            <button class="filter-btn" data-level="intermediate">중급</button>
+            <button class="filter-btn" data-level="advanced">고급</button>
+          </div>
+          <div class="quiz-count-row">
+            <label for="quiz-count">문제 수</label>
+            <select id="quiz-count">
+              <option value="5">5문제</option>
+              <option value="10" selected>10문제</option>
+              <option value="20">20문제</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-block" id="quiz-start-btn">퀴즈 시작</button>
+        </div>
+
+        <div id="quiz-play" class="quiz-play" hidden>
+          <div class="quiz-progress-row">
+            <span id="quiz-position">문제 1 / 10</span>
+            <span id="quiz-score">정답 0</span>
+          </div>
+          <div class="progress-bar-outer small">
+            <div class="progress-bar-inner" id="quiz-progress-bar"></div>
+          </div>
+
+          <div class="quiz-question-card">
+            <div class="quiz-question-label">다음 단어의 뜻은?</div>
+            <div class="quiz-question-word" id="quiz-word">word</div>
+          </div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <button class="btn btn-primary btn-block" id="quiz-next-btn" hidden>다음 문제 →</button>
+        </div>
+
+        <div id="quiz-result" class="quiz-result" hidden>
+          <h2>퀴즈 결과</h2>
+          <div class="result-score" id="result-score">0 / 0</div>
+          <div class="result-message" id="result-message"></div>
+          <div class="cta-row">
+            <button class="btn btn-secondary" id="quiz-retry-btn">다시 풀기</button>
+            <button class="btn btn-primary" id="quiz-home-btn">홈으로</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORD LIST VIEW -->
+      <section id="view-wordlist" class="view">
+        <div class="view-toolbar">
+          <input type="text" id="wordlist-search" class="search-input" placeholder="단어 또는 뜻 검색..." />
+          <div class="filter-group" id="wordlist-level-filter">
+            <button class="filter-btn active" data-level="all">전체</button>
+            <button class="filter-btn" data-level="beginner">초급</button>
+            <button class="filter-btn" data-level="intermediate">중급</button>
+            <button class="filter-btn" data-level="advanced">고급</button>
+          </div>
+        </div>
+        <div class="wordlist-table" id="wordlist-table"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="data/words.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
