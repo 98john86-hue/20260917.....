@@ -262,7 +262,14 @@
   });
 
   // ---------- QUIZ ----------
-  var quizState = { level: "all", count: 10, questions: [], index: 0, score: 0 };
+  var quizState = { level: "all", type: "meaning", count: 10, questions: [], index: 0, score: 0 };
+
+  document.getElementById("quiz-type-filter").addEventListener("click", function (e) {
+    var btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+    quizState.type = btn.dataset.type;
+    setFilterActive("quiz-type-filter", btn.dataset.type);
+  });
 
   document.getElementById("quiz-level-filter").addEventListener("click", function (e) {
     var btn = e.target.closest(".filter-btn");
@@ -275,17 +282,54 @@
     quizState.count = parseInt(e.target.value, 10);
   });
 
-  function buildQuestions() {
-    var pool = byLevel(quizState.level);
-    if (pool.length < 4) pool = words; // not enough for distractors
-    var count = Math.min(quizState.count, pool.length);
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  // Blanks out the target word inside its example sentence. Words are
+  // stored in base form but some examples use an inflected form
+  // (e.g. "runs"), so this only blanks an exact, whole-word match.
+  function buildBlankedSentence(w) {
+    var re = new RegExp("\\b" + escapeRegex(w.word) + "\\b", "i");
+    if (!re.test(w.example)) return null;
+    return w.example.replace(re, "_____");
+  }
+
+  function buildMeaningQuestions(pool, count) {
     var picked = shuffle(pool).slice(0, count);
     return picked.map(function (w) {
       var distractorSource = words.filter(function (x) { return x.word !== w.word && x.meaning !== w.meaning; });
       var distractors = shuffle(distractorSource).slice(0, 3).map(function (x) { return x.meaning; });
       var options = shuffle([w.meaning].concat(distractors));
-      return { word: w, options: options, answer: w.meaning };
+      return { type: "meaning", word: w, options: options, answer: w.meaning };
     });
+  }
+
+  function buildSentenceQuestions(pool, count) {
+    var candidates = pool
+      .map(function (w) { return { w: w, blanked: buildBlankedSentence(w) }; })
+      .filter(function (c) { return c.blanked !== null; });
+    var picked = shuffle(candidates).slice(0, count);
+    return picked.map(function (c) {
+      var w = c.w;
+      var distractorSource = words.filter(function (x) { return x.word !== w.word; });
+      var distractors = shuffle(distractorSource).slice(0, 3).map(function (x) { return x.word; });
+      var options = shuffle([w.word].concat(distractors));
+      return { type: "sentence", word: w, blanked: c.blanked, options: options, answer: w.word };
+    });
+  }
+
+  function buildQuestions() {
+    var pool = byLevel(quizState.level);
+    if (pool.length < 4) pool = words; // not enough for distractors
+    var count = Math.min(quizState.count, pool.length);
+    if (quizState.type === "sentence") {
+      var qs = buildSentenceQuestions(pool, count);
+      if (qs.length) return qs;
+      // fall back to the full word list if the level has too few usable sentences
+      return buildSentenceQuestions(words, Math.min(quizState.count, words.length));
+    }
+    return buildMeaningQuestions(pool, count);
   }
 
   document.getElementById("quiz-start-btn").addEventListener("click", function () {
@@ -306,7 +350,24 @@
     document.getElementById("quiz-score").textContent = "정답 " + quizState.score;
     var pct = Math.round((quizState.index / qs.length) * 100);
     document.getElementById("quiz-progress-bar").style.width = pct + "%";
-    document.getElementById("quiz-word").textContent = q.word.word;
+
+    var labelEl = document.getElementById("quiz-question-label");
+    var wordEl = document.getElementById("quiz-word");
+    var hintEl = document.getElementById("quiz-hint");
+
+    if (q.type === "sentence") {
+      labelEl.textContent = "빈칸에 들어갈 단어는?";
+      wordEl.classList.add("sentence-mode");
+      wordEl.innerHTML = escapeHtml(q.blanked).replace("_____", '<span class="blank">_____</span>');
+      hintEl.textContent = q.word.exampleKo;
+      hintEl.hidden = false;
+    } else {
+      labelEl.textContent = "다음 단어의 뜻은?";
+      wordEl.classList.remove("sentence-mode");
+      wordEl.textContent = q.word.word;
+      hintEl.hidden = true;
+      hintEl.textContent = "";
+    }
 
     var optsEl = document.getElementById("quiz-options");
     optsEl.innerHTML = "";

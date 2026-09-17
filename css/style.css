@@ -339,6 +339,23 @@ body {
 }
 .quiz-question-label { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
 .quiz-question-word { font-size: 30px; font-weight: 800; color: var(--primary-dark); }
+.quiz-question-word.sentence-mode {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--text);
+}
+.quiz-question-word.sentence-mode .blank {
+  color: var(--primary-dark);
+  font-weight: 800;
+  border-bottom: 2px solid var(--primary);
+  padding: 0 4px;
+}
+.quiz-question-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
 .quiz-options {
   display: grid;
   gap: 10px;

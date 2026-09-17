@@ -134,6 +134,10 @@
       <section id="view-quiz" class="view">
         <div id="quiz-setup" class="quiz-setup">
           <h2>퀴즈 설정</h2>
+          <div class="filter-group" id="quiz-type-filter">
+            <button class="filter-btn active" data-type="meaning">뜻 맞추기</button>
+            <button class="filter-btn" data-type="sentence">문장 완성</button>
+          </div>
           <div class="filter-group" id="quiz-level-filter">
             <button class="filter-btn active" data-level="all">전체</button>
             <button class="filter-btn" data-level="beginner">초급</button>
@@ -161,8 +165,9 @@
           </div>
 
           <div class="quiz-question-card">
-            <div class="quiz-question-label">다음 단어의 뜻은?</div>
+            <div class="quiz-question-label" id="quiz-question-label">다음 단어의 뜻은?</div>
             <div class="quiz-question-word" id="quiz-word">word</div>
+            <div class="quiz-question-hint" id="quiz-hint" hidden></div>
           </div>
           <div class="quiz-options" id="quiz-options"></div>
           <button class="btn btn-primary btn-block" id="quiz-next-btn" hidden>다음 문제 →</button>
